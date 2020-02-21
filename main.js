@@ -1,40 +1,153 @@
-var mysql = require("mysql");
-var inquirer = require("inquirer");
+const inquirer=require("inquirer");
+const mysql=require("mysql");
+const connection=require("./config/connection.js");
+const orm=require("./config/orm.js");
+const columnify=require("columnify");
+const chalk=require("chalk");
 
+var allChoices=["View All Employees", "View All Departments", "View All Roles","Add employee", "Add Role", "Add Department", "Update Employee Roles"];
+var allEmployee=[];
+var allRoles=[];
 
-var connection = mysql.createConnection({
-  host: "localhost",
-  port: 3306,
-  user: "root",
-  password: "MySQL@1993",
-  database: "homework10"
-});
-
-connection.connect(function(err) {
-    if (err) throw err;
-    start();
+function initVariables(){
+  orm.select("concat(first_name,' ',last_name) as name","employee",function(data){
+    for(var i=0; i<data.length; i++){
+    allEmployee.push(data[i].name);
+    }
   });
+  orm.select("title", "roles",function(data){
+    for(var i=0; i<data.length; i++){
+    allRoles.push(data[i].title);
+    }
+  });
+}
+
 
   function start() {
+    initVariables();
     inquirer
       .prompt({
         name: "selection",
         type: "list",
         message: "Would you like to do?",
-        choices: ["View All Employees", "View All Employee By Department", "View All Employee By Managers"]
+        choices: allChoices,
       })
       .then(function(answer) {
-        if (answer.selection == "View All Employees") {
-            
-          console.log("View All Employees");
-        } else if(answer.selection=="View All Employee By Department"){
-            console.log("View All Employee By Department");
-        }else if(answer.selection=="View All Employee By Managers"){
-            console.log("View All Employee By Managers");
-        }
-        else {
-          connection.end();
-        }
-      });
+        if (answer.selection == allChoices[0]) {
+            orm.getAllEmployee(function(data){
+              var colArr1=['first_name', 'last_name', 'title', 'department', 'salary', 'Manager'];
+              print(data, colArr1);
+              start();
+            }); 
+         }else if (answer.selection == allChoices[1]) {
+          orm.select("*", "department", function(data){
+            var colarr2=["id", "department"];
+            print(data, colarr2);
+            start();
+          });
+            }else if (answer.selection == allChoices[2]) {
+           orm.select("*","roles", function(data){
+             var colarr3=["title","salary","department_id"];
+             print(data,colarr3);
+             start();
+           })
+
+           //add employee
+              }else if (answer.selection == allChoices[3]) { 
+                inquirer
+                .prompt([
+                  {
+                  name: "first",
+                  type: "input",
+                  message: "Enter First name",
+                },
+                {
+                  name: "last",
+                  type: "input",
+                  message: "Enter Last Name",
+                },
+                {
+                  name: "selection",
+                  type: "list",
+                  message: "Select your role",
+                  choices: allRoles,
+                },
+                {
+                  name: "manager",
+                  type: "list",
+                  message: "Select manager",
+                  choices: allEmployee,
+                }
+              ])
+                .then(function(answer) {
+                  
+                  orm.selectWithCondition("id","roles","title="+"'"+answer.selection+"'",function(data){
+                    console.log(data);
+                   var roleId=data[0].id;
+  
+                 orm.selectWithCondition("id","employee","first_name="+"'"+answer.manager.substring(0,answer.manager.indexOf(" "))+"'", function(data){
+                   var managerId=data[0].id;
+                console.log(managerId);
+                orm.addEmployee(answer.first,answer.last,roleId,managerId);
+                console.log(chalk.green("Successfully added new employee: "+answer.first+" "+answer.last));
+                  start();
+                });
+              });
+            });
+             }else if (answer.selection == allChoices[4]) {
+              inquirer
+              .prompt([
+                {
+                name: "title",
+                type: "input",
+                message: "Enter role",
+              },
+              {
+                name: "salary",
+                type: "input",
+                message: "Enter salary",
+              },
+              {
+                name: "departmentId",
+                type: "input",
+                message: "Enter department id",
+              },
+            ])
+            .then(function(answer) {
+              orm.addRole(answer.title,answer.salary,answer.departmentId);
+              start();
+            });
+                  }else  if (answer.selection == allChoices[5]) {
+                    inquirer
+                    .prompt([
+                      {
+                      name: "id",
+                      type: "input",
+                      message: "Department id:",
+                    },
+                    {
+                      name: "department",
+                      type: "input",
+                      message: "Enter department name:",
+                    },
+                  ])
+                  .then(function(answer) {
+                    orm.addDepartment(answer.id,answer.department);
+                    start();
+                  });
+                    }else  if (answer.selection == allChoices[6]) {
+                        orm.getAllEmployee();
+                      }
+
+          
+         });
   }
-  connection.end();
+
+  function print(data, column){
+    var columns = columnify(data, {
+      columns: column
+    });
+    console.log("\n\n"+columns+"\n\n");
+  }
+
+  start();
