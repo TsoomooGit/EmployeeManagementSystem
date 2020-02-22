@@ -159,7 +159,7 @@ function initVariables(){
                             var newRoleId=data[0].id;
                             console.log(newRoleId);
                             orm.updateEmployeeRole(roleId,newRoleId,answer.employee.substring(0,answer.employee.indexOf(" ")));
-                            console.log(chalk.green("Successfully updated employee role: "+answer.employee));
+                            console.log(chalk.green("Successfully updated employee role: "+answer.employee))
                           })
                    
                       })
