@@ -26,7 +26,7 @@ getAllEmployee: function(cb){
     })
 
   },
-  //Select id from roles where title="Sales manager";
+  
   selectWithCondition: function(valueToPull, table,condition, cb){
       var queryString="Select "+valueToPull+" from "+table+" where "+condition+";";
       console.log(queryString);
@@ -51,9 +51,7 @@ getAllEmployee: function(cb){
       if(err) throw err;
     })
   },
-//   UPDATE Employee
-// SET manager = 1, manager=3
-// WHERE first_name="Tsolmon";
+
   updateEmployeeRole: function(c,currentRoleId, newRoleId, firstName){
       var queryString="UPDATE employee SET "+c+" = "+currentRoleId+", " + c+" = "+newRoleId +" WHERE first_name= "+"'"+firstName+"'"+";";
       connection.query(queryString, function(err, result){
