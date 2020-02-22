@@ -43,15 +43,13 @@ function initVariables(){
                     addEmployee();
                   }else if (answer.selection == allChoices[4]) {
                     addRole();
-                  }else  if (answer.selection == allChoices[5]) {
+                  }else  if (answer.selection == allChoices[5]){
                     addDepartment();
-                  }else  if (answer.selection == allChoices[6]) {
+                  }else  if (answer.selection == allChoices[6]){
                     updateEmployeeRole();
-                  }
-                  else if (answer.selection == allChoices[7]) {
+                  }else if (answer.selection == allChoices[7]) {
                     deleteEmployee();
-                  }
-                  else if (answer.selection == allChoices[8]){
+                  }else if (answer.selection == allChoices[8]) {
                     updateEmployeeManager();
                   }
 });
