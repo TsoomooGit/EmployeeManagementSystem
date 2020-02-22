@@ -136,11 +136,39 @@ function initVariables(){
                     start();
                   });
                     }else  if (answer.selection == allChoices[6]) {
-                        orm.getAllEmployee();
-                      }
-
-          
+                      inquirer
+                      .prompt([
+                        {
+                          name: "employee",
+                          type: "list",
+                          message: "Select employee name:",
+                          choices: allEmployee,
+                        },
+                        {
+                          name:"role",
+                          type:"list",
+                          message: "Select employee new role:",
+                          choices: allRoles,
+                        }
+                      ]).then(function(answer){
+                      
+                        orm.selectWithCondition("role_id","employee","first_name="+"'"+answer.employee.substring(0,answer.employee.indexOf(" "))+"'", function(data){
+                          var roleId=data[0].role_id;
+                          console.log(roleId);
+                          orm.selectWithCondition("id","roles","title="+"'"+answer.role+"'", function(data){
+                            var newRoleId=data[0].id;
+                            console.log(newRoleId);
+                            orm.updateEmployeeRole(roleId,newRoleId,answer.employee.substring(0,answer.employee.indexOf(" ")));
+                            console.log(chalk.green("Successfully updated employee role: "+answer.employee));
+                          })
+                   
+                      })
+                    });
+                  }
+                  
          });
+      
+  
   }
 
   function print(data, column){

@@ -50,6 +50,13 @@ getAllEmployee: function(cb){
     connection.query(queryString, function(err, result){
       if(err) throw err;
     })
+  },
+  updateEmployeeRole: function(currentRoleId, newRoleId, firstName){
+      var queryString="UPDATE employee SET role_id = "+currentRoleId+", " + "role_id= "+newRoleId +" WHERE first_name= "+"'"+firstName+"'"+";";
+      connection.query(queryString, function(err, result){
+        if(err) throw err;
+      })
+
   }
 
 }
