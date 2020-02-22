@@ -5,7 +5,7 @@ const orm=require("./config/orm.js");
 const columnify=require("columnify");
 const chalk=require("chalk");
 
-var allChoices=["View All Employees", "View All Departments", "View All Roles","Add employee", "Add Role", "Add Department", "Update Employee Roles"];
+var allChoices=["View All Employees", "View All Departments", "View All Roles","Add employee", "Add Role", "Add Department", "Update Employee Roles", "Delete Employee"];
 var allEmployee=[];
 var allRoles=[];
 
@@ -154,18 +154,33 @@ function initVariables(){
                       
                         orm.selectWithCondition("role_id","employee","first_name="+"'"+answer.employee.substring(0,answer.employee.indexOf(" "))+"'", function(data){
                           var roleId=data[0].role_id;
-                          console.log(roleId);
+                        
                           orm.selectWithCondition("id","roles","title="+"'"+answer.role+"'", function(data){
                             var newRoleId=data[0].id;
-                            console.log(newRoleId);
+                           
                             orm.updateEmployeeRole(roleId,newRoleId,answer.employee.substring(0,answer.employee.indexOf(" ")));
                             console.log(chalk.green("Successfully updated employee role: "+answer.employee))
+                            start();
                           })
                    
                       })
                     });
                   }
-                  
+                  else if (answer.selection == allChoices[7]) {
+                    inquirer
+                    .prompt([
+                      {
+                        name: "employee",
+                        type: "list",
+                        message: "Select employee to delete:",
+                        choices: allEmployee,
+                      },
+                    ]).then(function(answer){
+                      orm.deleteWithCondition("employee","first_name= "+"'"+answer.employee.substring(0,answer.employee.indexOf(" "))+"'");
+                      console.log(chalk.green("Successfully deleted employee: "+answer.employee));
+                      start();
+                    })
+                  }
          });
       
   

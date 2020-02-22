@@ -57,7 +57,13 @@ getAllEmployee: function(cb){
         if(err) throw err;
       })
 
-  }
+  },
+deleteWithCondition: function(tableName,condition){
+var queryString="Delete from "+tableName+" where "+condition+";";
+connection.query(queryString, function(err, result){
+  if(err) throw err;
+})
+}
 
 }
 
